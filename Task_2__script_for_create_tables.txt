@@ -1,0 +1,144 @@
+col table_name for a30
+col CONSTRAINT_NAME for a40
+col SEARCH_CONDITION_VC for a35
+set line 120 pages  120
+break on table_name
+set feedback off
+
+drop table country cascade constraints purge;
+drop table state cascade constraints purge;
+drop table city cascade constraints purge;
+drop table enquiry_master cascade constraints purge;
+drop table source_master cascade constraints purge;
+drop table source_history cascade constraints purge;
+drop table stream cascade constraints purge;
+drop table qualification cascade constraints purge;
+drop table college cascade constraints purge;
+drop table college_sem cascade constraints purge;
+drop table college_year cascade constraints purge;
+drop table college_history cascade constraints purge;
+drop table course cascade constraints purge;
+drop table staff cascade constraints purge;
+drop table follow_up cascade constraints purge;
+drop table enquiry_handled cascade constraints purge;
+
+create table country(country_id number constraint country_country_id_pk primary key,
+                     country_name varchar2(25) constraint country_country_name_unique unique
+                                               constraint country_country_name_nn not null);
+
+create table state(state_id number constraint state_state_id_pk primary key,
+                   state_name varchar2(20) constraint state_state_name_nn not null,
+                   country_id number constraint state_country_id_fk references country(country_id));
+
+create table city(city_id number constraint city_city_id_pk primary key,
+                  city_name varchar2(85) constraint city_city_name_nn not null,
+                  state_id number constraint city_state_id_fk references state(state_id));
+
+create table enquiry_master(enquiry_id number constraint enquiry_master_enquiry_id_pk primary key,
+                            name varchar2(30),
+                            phone_no number constraint enquiry_master_phone_no_unique unique
+                                            constraint enquiry_master_phone_no_check check(length(phone_no)=10)
+                                            constraint enquiry_master_phone_no_nn not null,
+                            email varchar2(30) constraint enquiry_master_email_check check(email like '%@%.%')
+                                               constraint enquiry_master_email_nn not null,
+                            address varchar2(100),
+                            gender varchar2(1),
+                            age number(3),
+                            working boolean,
+                            work_experience interval year to month,
+                            job_profile varchar2(30),
+                            city_id number constraint enquiry_master_city_id_fk references city);
+
+create table source_master(source_id number constraint source_master_source_id_pk primary key,
+                           source_name varchar2(30) constraint source_master_source_name_unique unique
+                                                    constraint source_master_source_name_nn not null);
+
+create table source_history(source_id number constraint source_history_source_id_fk references source_master(source_id),
+                            enquiry_id number constraint source_history_enquiry_id_fk references enquiry_master(enquiry_id),
+                            source_date_of_enquiry date default sysdate,
+                            constraint source_history_source_id_enquiry_id_source_date_of_enquiry primary key(source_id,enquiry_id,source_date_of_enquiry));
+
+create table stream(stream_id number constraint stream_stream_id_pk primary key,
+                    stream_name varchar2(50) constraint stream_stream_name_nn not null);
+
+create table qualification(qid number constraint qualification_qid_pk primary key,
+                           degree_name varchar2(50) constraint qualification_degree_name_nn not null);
+
+create table college(college_id number constraint college_college_id_pk primary key,
+                     college_name varchar2(60) constraint college_college_name_nn not null);
+
+create table college_sem(sem_id number constraint college_sem_sem_id_pk primary key,
+                         sem_name varchar2(50) constraint college_sem_sem_name_unique unique
+                                               constraint college_sem_sem_name_nn not null);
+
+create table college_year(year_id number constraint college_year_year_id_pk primary key,
+                          year_name varchar2(25) constraint college_year_year_name_unique unique
+                                                 constraint college_year_year_name_nn not null);
+
+create table college_history(enquiry_id number constraint college_history_enquiry_id_fk references enquiry_master(enquiry_id),
+                             college_id number constraint college_history_college_id_fk references college(college_id),
+                             date_of_change date default sysdate,
+                             sem_id number constraint college_history_sem_id_fk references college_sem(sem_id),
+                             year_id number constraint college_history_year_id_fk references college_year(year_id),
+                             qid number constraint college_history_qid_fk references qualification(qid),
+                             stream_id number constraint college_history_stream_id_fk references stream(stream_id));
+
+create table course(course_id number constraint course_course_id_pk primary key,
+                    course_name varchar2(75) constraint course_course_name_unique unique
+                                             constraint course_course_name_nn not null,
+                    fee number constraint course_fee_nn not null);
+
+create table staff(staff_id number constraint staff_staff_id_pk primary key,
+                   staff_name varchar2(75) constraint staff_staff_name_nn not null);
+
+CREATE TABLE follow_up (
+      followup_id NUMBER,
+      staff_id NUMBER,
+      enquiry_id NUMBER,
+      today_date date default sysdate,
+      status VARCHAR2(70) GENERATED ALWAYS AS (case
+             when floor(today_date-next_followup_date)>1 then floor(today_date-next_followup_date)||' days left'
+             when floor(today_date-next_followup_date)=1 then floor(today_date-next_followup_date)||' day left'
+             when floor(today_date-next_followup_date)<1 or floor(today_date-next_followup_date)>7 then 'It is revoked'
+             else 'It is revoked' end),
+      date_of_followup DATE DEFAULT SYSDATE,
+      remark VARCHAR2(128),
+      next_followup_date DATE,
+      CONSTRAINT follow_up_followup_id_pk PRIMARY KEY (followup_id),
+      CONSTRAINT follow_up_staff_id_fk FOREIGN KEY (staff_id) REFERENCES staff(staff_id),
+      CONSTRAINT follow_up_enquiry_id_fk FOREIGN KEY (enquiry_id) REFERENCES enquiry_master(enquiry_id));
+
+alter table follow_up modify today_date invisible;
+
+create table enquiry_handled(enquiry_id number constraint enquiry_handled_enquiry_id_fk references enquiry_master(enquiry_id),
+                             assigned_date_to_staff date,
+                             handled_enquiry_date date constraint enquiry_handled_handled_enquiry_date_nn not null,
+                             fee_suggested number,
+                             staff_status boolean,
+                             enquiry_status boolean,
+                             course_id number constraint enquiry_handled_course_id_fk references course(course_id),
+                             staff_id number constraint enquiry_handled_staff_id_fk references staff(staff_id),
+                             visited_status boolean,
+                             registered_status boolean,
+                             close_date_of_enquiry date constraint enquiry_handled_close_date_of_enquiry_nn not null,
+                             close_enquiry_status boolean);
+
+select 'country' as table_name,constraint_name,constraint_type,search_condition_vc from user_constraints where lower(table_name)=lower('country');
+select 'state' as table_name,constraint_name,constraint_type,search_condition_vc from user_constraints where lower(table_name)=lower('state');
+select 'city' as table_name,constraint_name,constraint_type,search_condition_vc from user_constraints where lower(table_name)=lower('city');
+select 'enquiry_master' as table_name,constraint_name,constraint_type,search_condition_vc from user_constraints where lower(table_name)=lower('enquiry_master');
+select 'source_master' as table_name,constraint_name,constraint_type,search_condition_vc from user_constraints where lower(table_name)=lower('source_master');
+select 'source_history' as table_name,constraint_name,constraint_type,search_condition_vc from user_constraints where lower(table_name)=lower('source_history');
+select 'stream' as table_name,constraint_name,constraint_type,search_condition_vc from user_constraints where lower(table_name)=lower('stream');
+select 'qualification' as table_name,constraint_name,constraint_type,search_condition_vc from user_constraints where lower(table_name)=lower('qualification');
+select 'college' as table_name,constraint_name,constraint_type,search_condition_vc from user_constraints where lower(table_name)=lower('college');
+select 'college_sem' as table_name,constraint_name,constraint_type,search_condition_vc from user_constraints where lower(table_name)=lower('college_sem');
+select 'college_year' as table_name,constraint_name,constraint_type,search_condition_vc from user_constraints where lower(table_name)=lower('college_year');
+select 'college_history' as table_name,constraint_name,constraint_type,search_condition_vc from user_constraints where lower(table_name)=lower('college_history');
+select 'course' as table_name,constraint_name,constraint_type,search_condition_vc from user_constraints where lower(table_name)=lower('course');
+select 'staff' as table_name,constraint_name,constraint_type,search_condition_vc from user_constraints where lower(table_name)=lower('staff');
+select 'follow_up' as table_name,constraint_name,constraint_type,search_condition_vc from user_constraints where lower(table_name)=lower('follow_up');
+select 'enquiry_handled' as table_name,constraint_name,constraint_type,search_condition_vc from user_constraints where lower(table_name)=lower('enquiry_handled');
+
+clear break
+set feedback on

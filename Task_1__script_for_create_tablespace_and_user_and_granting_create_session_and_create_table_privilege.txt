@@ -1,0 +1,9 @@
+conn sys/Admin123@orclpdb as sysdba
+col file_name for a60
+set line 200
+create tablespace sqlproject datafile 'C:\ORACLE23AI\SQL23\ORADATA\FREE\FREEPDB1\SQLPROJECT1.dbf' size 100m autoextend on next 10m;
+create user sqlproject identified by unisoft default tablespace sqlproject quota unlimited on sqlproject;
+grant create session, create table, create sequence, create view, create synonym, create public synonym to sqlproject;
+conn sqlproject/unisoft@orclpdb
+show con_name
+show user

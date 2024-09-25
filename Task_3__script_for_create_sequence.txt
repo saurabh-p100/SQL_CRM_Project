@@ -1,0 +1,83 @@
+set line 300
+set feedback off
+drop sequence country_seq;
+drop sequence state_seq;
+drop sequence city_seq;
+drop sequence college_seq;
+drop sequence qual_seq;
+drop sequence stream_seq;
+drop sequence col_sem_seq;
+drop sequence col_year_seq;
+drop sequence sm_seq;
+drop sequence course_seq;
+drop sequence staff_seq;
+drop sequence fol_up_seq;
+drop sequence em_seq;
+
+
+create sequence country_seq start with 6725 increment by 32;
+create sequence state_seq start with 2356 increment by 5;
+create sequence city_seq start with 177 increment by 9;
+create sequence college_seq start with 9576 increment by 5;
+create sequence qual_seq start with 8412 increment by 5;
+create sequence stream_seq start with 3263 increment by 32;
+create sequence col_sem_seq start with 6326 increment by 9;
+create sequence col_year_seq start with 7752 increment by 3;
+create sequence sm_seq start with 5528 increment by 32;
+create sequence course_seq start with 111 increment by 5;
+create sequence staff_seq start with 3475 increment by 32;
+create sequence fol_up_seq start with 7591 increment by 9;
+create sequence em_seq start with 1001 increment by 5;
+
+
+select QUAL_SEQ.nextval as qid,
+       CITY_SEQ.nextval as city_id,
+       COLLEGE_SEQ.nextval as college_id,
+       COL_SEM_SEQ.nextval as sem_id,
+       COL_YEAR_SEQ.nextval as year_id,
+       COUNTRY_SEQ.nextval as country_id,
+       COURSE_SEQ.nextval as course_id,
+       EM_SEQ.nextval enquiry_id,
+       FOL_UP_SEQ.nextval as followup_id,
+       SM_SEQ.nextval as source_id,
+       STAFF_SEQ.nextval as staff_id,
+       STATE_SEQ.nextval as state_id,
+       STREAM_SEQ.nextval as stream_id
+from dual;
+
+
+/*
+select QUAL_SEQ.currval as qid,
+       CITY_SEQ.currval as city_id,
+       COLLEGE_SEQ.currval as college_id,
+       COL_SEM_SEQ.currval as sem_id,
+       COL_YEAR_SEQ.currval as year_id,
+       COUNTRY_SEQ.currval as country_id,
+       COURSE_SEQ.currval as course_id,
+       EM_SEQ.currval enquiry_id,
+       FOL_UP_SEQ.currval as followup_id,
+       SM_SEQ.currval as source_id,
+       STAFF_SEQ.currval as staff_id,
+       STATE_SEQ.currval as state_id,
+       STREAM_SEQ.currval as stream_id
+from dual;
+*/
+
+
+alter sequence QUAL_SEQ restart start with 8412 increment by 5;
+alter sequence CITY_SEQ restart start with 177 increment by 9;
+alter sequence COLLEGE_SEQ restart start with 9576 increment by 5;
+alter sequence COL_SEM_SEQ restart start with 6326 increment by 9;
+alter sequence COL_YEAR_SEQ restart start with 7752 increment by 3;
+alter sequence COUNTRY_SEQ restart start with 6725 increment by 32;
+alter sequence COURSE_SEQ restart start with 111 increment by 5;
+alter sequence EM_SEQ restart start with 1001 increment by 5;
+alter sequence FOL_UP_SEQ restart start with 7591 increment by 9;
+alter sequence SM_SEQ restart start with 5528 increment by 32;
+alter sequence STAFF_SEQ restart start with 3475 increment by 32;
+alter sequence STATE_SEQ restart start with 2356 increment by 5;
+alter sequence STREAM_SEQ restart start with 3263 increment by 32;
+
+
+set line 120 pages 120
+set feedback on
