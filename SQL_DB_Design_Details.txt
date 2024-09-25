@@ -1,0 +1,20 @@
+
+
+Task or (SQL project). Create all these tables, with proper data types and constraints. Insert some sample data. Then solve some queries. Try to create question for queries yourself.
+
+Enquiry_Handled Table
+
+Staff_status - Assigned,Not Assigned
+Enquiry_Status - Open, Closed
+Visited_Status - Yes, No
+Registered_Status - Yes,No
+Close_Enquiry_Status - Manual, Auto
+
+Enquiry_Master Table
+
+Gender - M, F, O
+Working - Yes, No
+
+Follow_Up Table
+
+Status - 7 Days Left, 6 Days Left, 5 Days Left, 4 Days Left, 3 Days Left, 2 Days Left, 1 Day Left
